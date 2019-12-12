@@ -13,7 +13,7 @@
 using namespace std;
 
 #define timelimit 1
-#define FUCKITSELF true
+#define FUCKITSELF false
 
 void toyz() {
 	board bk;
@@ -88,12 +88,15 @@ int main () {
 				mainboard.update( x,y,color,0 );
 				cout << "=" << endl << endl ;
 
+			} else if(s[0]=='e') {
+				cout << "1" << endl << endl;
+			} else if ( s[0] == 'c' ) {
+				mainboard.reset_all();
+				cout << "=" << endl << endl;
 			}else if ( command[0] == 'g' || command == "reg_genmove" ){ // G COLOR
 				// time
 				int e , st;
-				e = st = clock();
-				cnt = 20000;
-				
+				e = st = clock();				
 				// color
 				cin >> c ;
 				if( c[0] == 'b' || c [0] == 'B' ) color = 0 ;
@@ -119,10 +122,19 @@ int main () {
 				}
 				cerr << "msts run\n" ; 
 				//mcts run
-				while(cnt--){
-					cerr << "cnt: " << cnt << endl;
+				while(1){
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
 					tree.run();
 					e = clock();
+					if ( ((double)(e-st) / CLOCKS_PER_SEC) > 0.9 ) break;
 				}
 				
 				cerr << "after run\n";
@@ -140,9 +152,11 @@ int main () {
 				cerr << "nogo win\n";
 			}else if ( command == "clear" ) {
 				mainboard.reset_all();
+			}else {
+				cout << "=" << endl << endl;
 			}
 
-			mainboard.show();
+			//mainboard.show();
 
 			if ( exit ) break;
 
