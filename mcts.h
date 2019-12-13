@@ -2,10 +2,10 @@
 #include <algorithm>
 #include <math.h>
 #include <cstdlib>
+#include <map>
 
-#define BLACK 0
-#define WHITE 1
-#define WEIGHT 0.75
+extern map<pair<int,int> , vector<node*> > bpath;
+extern map<pair<int,int> , vector<node*> > wpath;
 
 ostream & operator << (ostream &out, const pair<int,int> &p) {
     out << p.first << " " << p.second << " ";
@@ -17,13 +17,22 @@ public:
 	bool color;
 	node* root;
 	vector<node*> path;
+	// map< pair<int,int>, vector<node*> > bpath;
+	// map< pair<int,int>, vector<node*> > wpath;
 	board mboard;
 
 	double getscore( node* nodeptr, int child) {
 		//cerr << "in getscore ";
 		node *tmp = (nodeptr->childptr)+child;
 		//cerr <<  (double)tmp->win/(double)(tmp->count+1) << "  " << WEIGHT * sqrt(log((double)nodeptr->count)/(double)(tmp->count+1)) << " ";
-		return (double)tmp->win/(double)(tmp->count+1) + WEIGHT * sqrt(log((double)(nodeptr->count+1))/(double)(tmp->count+1));
+		double ucbwin = (double)tmp->win/(double)(tmp->count+1) ;
+		double exporation = WEIGHT * sqrt(log((double)(nodeptr->count+1))/(double)(tmp->count+1));
+		if ( RAVE ) {
+			double ravewin = (double)tmp->ravewin/(double)(tmp->ravecount+1) ;
+			double ravepercent = (double)(tmp->ravecount+1)/((double)(tmp->ravecount+1)+(double)(tmp->count+1));
+			double ucbpercent = (double)(tmp->count+1)/((double)(tmp->ravecount+1)+(double)(tmp->count+1));
+			return ravepercent*ravewin + ucbpercent*ucbwin + exporation ;
+		} else return ucbwin + exporation;
 	}
 
 	node* getbestchild(node* nodeptr) {
@@ -74,12 +83,12 @@ public:
 		}
 	}
 
-	bool simulate(board& b, bool color) {
+	bool simulate(board& b, bool c) {
 		bool flag = true;
 		vector<pair<int,int> > my;
 		vector<pair<int,int> > promy;
 		
-		bool nowcolor = !color;
+		bool nowcolor = !c;
 		while(1) {
 			pair<int,int> choose;
 			b.get_avaiable(nowcolor,my,promy);
@@ -88,7 +97,7 @@ public:
 			else flag = false;
 
 			if ( flag == false ) break;
-			else b.update(choose.first,choose.second,nowcolor,0);
+			else b.update(choose.first,choose.second,nowcolor,1);
 			nowcolor = !nowcolor;
 			my.clear();
 			promy.clear();
@@ -97,13 +106,20 @@ public:
 		return !nowcolor;
 	}
 
-	void update(bool winer) {
-		int win ;
-		if ( winer == color ) win = 1;
-		else win = 0;
+	void update(bool winner) {
 		for ( int i = 0 ; i < path.size() ; i++ ) {
-			path[i]->count++;
-			path[i]->win += win;
+			path[i]->update(winner);
+			if ( RAVE ) {
+				if ( path[i]->color == 0 ) {
+					for ( auto j : bpath[path[i]->place] ) {
+						j->update_rave(winner);
+					}
+				} else {
+					for ( auto j : wpath[path[i]->place] ) {
+						j->update_rave(winner);
+					}
+				}
+			}
 		}
 	}
 
@@ -128,16 +144,42 @@ public:
 	}
 
 	void reset(board& b, bool color) {
-		cerr << "now color " <<  color << endl; 
+		
 		this->color = color;
 		mboard = b ;
-		b.show();
-		//b.set_air();
-		//b.show_checker();
-		//b.show_air();
+		bpath.clear();
+		wpath.clear();
+
+		if ( RAVE ) {
+			for ( int i = 1 ; i < 10 ; i++ ) {
+				for ( int j = 1 ; j < 10 ; j++ ) {
+					if ( b.checker(i,j,0) ) {
+						vector<node*> tmp;
+						bpath[pair<int,int>(i,j)] = tmp;
+					}
+					if ( b.checker(i,j,1) ) {
+						vector<node*> tmp;
+						wpath[pair<int,int>(i,j)] = tmp;
+					}
+				}
+			}
+		}
+
 		root = new node;
 		root->initnode(pair<int,int>(0,0),!color);
 		root->expansion(b);
+		// if ( RAVE ) {
+		// 	for ( int i = 1 ; i < 10 ; i++ ) {
+		// 		for ( int j = 1 ; j < 10 ; j++ ) {
+		// 			if ( b.checker(i,j,0) ) {
+		// 				cerr << i << " " << j << " " << bpath[pair<int,int>(i,j)].size() << endl;
+		// 			}
+		// 			if ( b.checker(i,j,1) ) {
+		// 				cerr << i << " " << j << " " << wpath[pair<int,int>(i,j)].size() << endl;
+		// 			}
+		// 		}
+		// 	}
+		// }
 		// for ( int i = 0 ; i < root->csize ; i++ ) {
 		// 	cerr << ((root->childptr)+i)->place << "   " ; 
 		// }
@@ -151,7 +193,7 @@ public:
 	pair<int,int> getbestmove() {
 		int ans = 0 , pos = 0 ;
 		for ( int i = 0 ; i < root->csize ; i++ ) {
-			cerr << root->childptr[i].count << "/" << root->childptr[i].win << " " ;
+			cerr << root->childptr[i].count << "/" << root->childptr[i].win << ":" << root->childptr[i].ravecount << "/" << root->childptr[i].ravewin << " " ; 
 			if ( root->childptr[i].count > ans ) {		
 				pos = i ;
 				ans = root->childptr[i].count;

@@ -12,10 +12,7 @@
 
 using namespace std;
 
-#define timelimit 1
-#define FUCKITSELF false
-#define countorclock true
-#define testcount 30000
+
 
 void toyz() {
 	board bk;
@@ -71,7 +68,7 @@ int main () {
 
 	string command, c, position;
 	pair<int,int> best_move;
-	bool color , exit;
+	bool color ;
 	board mainboard;
 	int x, y;
 	int cnt;
@@ -87,7 +84,7 @@ int main () {
 				pair<int,int> tmp = GTPstringtoint(position);
 				x = tmp.first;
 				y = tmp.second;
-				mainboard.update( x,y,color,0 );
+				mainboard.update( x,y,color,1 );
 				cout << "=" << endl << endl ;
 
 			} else if( command[0]=='e') {
@@ -115,16 +112,15 @@ int main () {
 					}
 				}
 				if ( resign == true ) {
-					exit = true;
 					cout << "=resign" << endl << endl;
 					continue;
 				}
 				//cerr << "msts run\n" ; 
 				//mcts run
 
-				cnt = testcount;
+				cnt = 0;
 				while(1){
-					cnt = cnt - 20 ;
+					cnt = cnt + 20 ;
 					tree.run();
 					tree.run();
 					tree.run();
@@ -146,23 +142,21 @@ int main () {
 					tree.run();
 					tree.run();
 					e = clock();
-					if ( countorclock == false && ((double)(e-st) / CLOCKS_PER_SEC) > 0.9 ) break;
-					if ( countorclock == true && cnt < 0 ) break;
+					if ( countorclock == false && ((double)(e-st) / CLOCKS_PER_SEC) > timelimit ) break;
+					if ( countorclock == true && cnt > testcount ) break;
 				}
-				
 				//cerr << "after run\n";
 				//best move 
 
 				best_move = tree.getbestmove();
-				mainboard.update(best_move.first,best_move.second,color,0);
+				mainboard.update(best_move.first,best_move.second,color,1);
 				//output
 				cerr << "simulation time : " << (double)(e-st) / 1000.0 << endl;
-				//cerr << "run times time : " << cnt*20 << endl;
+				cerr << "run times time : " << cnt << endl;
 				cout << "=" << inttoGTPstring(best_move) << endl << endl;
 
 				tree.clear();
 			} else if ( command == "resign" ) {
-				exit = true;
 				cerr << "nogo win\n";
 			} else if ( command == "clear_board" ) {
 				mainboard.reset_all();
@@ -203,15 +197,13 @@ int main () {
 				}
 			}
 			if ( resign == true ) {
-				exit = true;
 				cout << "=resign" << endl << endl;
+				cout << "winner = " << !color << endl;
 				break;
-				continue;
 			}
-			//cerr << "msts run\n" ; 
+
 			//mcts run
 			while(1){
-				//cerr << "cnt: " << cnt << endl;
 				tree.run();
 				tree.run();
 				tree.run();
@@ -225,28 +217,17 @@ int main () {
 				e = clock();
 				if ( ((double)(e-st) / CLOCKS_PER_SEC) > 0.9 ) break;
 			}
-			
-			//cerr << "after run\n";
-			//best move 
 
 			best_move = tree.getbestmove();
-			mainboard.update(best_move.first,best_move.second,color,0);
-			//output
-			cerr << "total node: " << endl;
+			mainboard.update(best_move.first,best_move.second,color,1);
+			
 			cerr << "simulation time : " << ((double)(e-st) / CLOCKS_PER_SEC) << endl;
 			cout << "=" << inttoGTPstring(best_move) << endl << endl;
 
 			tree.clear();
-			//mainboard.show_cout();
-			//mainboard.show();
-			//mainboard.show_air();
+			mainboard.show();
 
 			color = !color;
-			if ( resign == true ) { 
-				cout << "winner = " << color << endl;
-				break;
-			}
-			
 		}
 	}
 	cerr << "end of process\n";

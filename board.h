@@ -1,8 +1,6 @@
 //#include "bitboard.h"
 #include <set>
-
-#define BLACK 0
-#define WHITE 1
+#include "define.h"
 
 using namespace std;
 
@@ -26,6 +24,7 @@ public:
 			for ( int j = 1 ; j < 10 ; j++ ) {
 				this->hole[i][j] = b.hole[i][j];
 				this->b[i][j] = b.b[i][j];
+				//this->air[i][j] = b.air[i][j];
 			}
 		} 
 	}
