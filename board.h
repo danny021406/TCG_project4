@@ -184,7 +184,7 @@ public:
 	void get_avaiable(bool color, vector<pair<int,int> >& my, vector<pair<int,int> >& promy ) {
 		bool op_color = !color;
 		for ( int i = 1 ; i < 10 ; i++ ) {
-			for ( int j = 0 ; j < 10 ; j++ ) {
+			for ( int j = 1 ; j < 10 ; j++ ) {
 				bool mycolorc = checker(i,j,color);
 				bool opcolorc = checker(i,j,op_color);
 				if ( mycolorc == true && opcolorc == true ) promy.push_back( pair<int,int>(i,j) );

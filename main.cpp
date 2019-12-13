@@ -14,6 +14,8 @@ using namespace std;
 
 #define timelimit 1
 #define FUCKITSELF false
+#define countorclock true
+#define testcount 30000
 
 void toyz() {
 	board bk;
@@ -117,9 +119,22 @@ int main () {
 					cout << "=resign" << endl << endl;
 					continue;
 				}
-				cerr << "msts run\n" ; 
+				//cerr << "msts run\n" ; 
 				//mcts run
+
+				cnt = testcount;
 				while(1){
+					cnt = cnt - 20 ;
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
+					tree.run();
 					tree.run();
 					tree.run();
 					tree.run();
@@ -131,16 +146,18 @@ int main () {
 					tree.run();
 					tree.run();
 					e = clock();
-					if ( ((double)(e-st) / CLOCKS_PER_SEC) > 0.9 ) break;
+					if ( countorclock == false && ((double)(e-st) / CLOCKS_PER_SEC) > 0.9 ) break;
+					if ( countorclock == true && cnt < 0 ) break;
 				}
 				
-				cerr << "after run\n";
+				//cerr << "after run\n";
 				//best move 
 
 				best_move = tree.getbestmove();
 				mainboard.update(best_move.first,best_move.second,color,0);
 				//output
 				cerr << "simulation time : " << (double)(e-st) / 1000.0 << endl;
+				//cerr << "run times time : " << cnt*20 << endl;
 				cout << "=" << inttoGTPstring(best_move) << endl << endl;
 
 				tree.clear();
@@ -165,22 +182,13 @@ int main () {
 				cout << "=" << endl << endl;
 			}
 			//list_commands
-			//mainboard.show();
-
-			//if ( exit ) break;
+			mainboard.show();
 
 		}
 	}else {
 		while(1) {
-			int wer;
-			//cin >> wer;
-
-
-
 			int e , st;
 			e = st = clock();
-			
-
 			tree.reset(mainboard,color);
 
 			// resign

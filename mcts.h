@@ -5,7 +5,7 @@
 
 #define BLACK 0
 #define WHITE 1
-#define WEIGHT 0.25
+#define WEIGHT 0.75
 
 ostream & operator << (ostream &out, const pair<int,int> &p) {
     out << p.first << " " << p.second << " ";
@@ -151,9 +151,8 @@ public:
 	pair<int,int> getbestmove() {
 		int ans = 0 , pos = 0 ;
 		for ( int i = 0 ; i < root->csize ; i++ ) {
-			//cerr << root->childptr[i].count << "/" << root->childptr[i].win << " " ;
-			if ( root->childptr[i].count > ans ) {
-				
+			cerr << root->childptr[i].count << "/" << root->childptr[i].win << " " ;
+			if ( root->childptr[i].count > ans ) {		
 				pos = i ;
 				ans = root->childptr[i].count;
 			}
