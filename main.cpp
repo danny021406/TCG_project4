@@ -88,12 +88,9 @@ int main () {
 				mainboard.update( x,y,color,0 );
 				cout << "=" << endl << endl ;
 
-			} else if(s[0]=='e') {
+			} else if( command[0]=='e') {
 				cout << "1" << endl << endl;
-			} else if ( s[0] == 'c' ) {
-				mainboard.reset_all();
-				cout << "=" << endl << endl;
-			}else if ( command[0] == 'g' || command == "reg_genmove" ){ // G COLOR
+			} else if ( command[0] == 'g' || command == "reg_genmove" ){ // G COLOR
 				// time
 				int e , st;
 				e = st = clock();				
@@ -147,18 +144,30 @@ int main () {
 				cout << "=" << inttoGTPstring(best_move) << endl << endl;
 
 				tree.clear();
-			}else if ( command == "resign" ) {
+			} else if ( command == "resign" ) {
 				exit = true;
 				cerr << "nogo win\n";
-			}else if ( command == "clear" ) {
+			} else if ( command == "clear_board" ) {
 				mainboard.reset_all();
-			}else {
+				cout << "=" << endl << endl;
+			} else if ( command == "protocol_version" ) {
+				cout << "=2" << endl << endl;
+			} else if ( command == "name" ) {
+				cout << "=hehenogo" << endl << endl;
+			} else if ( command == "version" ) {
+				cout << "=simple" << endl << endl;
+			} else if ( command == "boardsize" ) {
+				cin >> position ;
+				cout << "=" << endl << endl;
+			} else if ( command == "list_commands" ) {
+				cout << "=" << endl << endl;
+			} else {
 				cout << "=" << endl << endl;
 			}
-
+			//list_commands
 			//mainboard.show();
 
-			if ( exit ) break;
+			//if ( exit ) break;
 
 		}
 	}else {

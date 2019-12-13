@@ -109,8 +109,11 @@ public:
 	}
 
 	void reset_all() {
+		cerr << "reset all \n";
 		reset_air();
+		cerr << "reset air \n";
 		reset_hole();
+		cerr << "reset hole \n";
 	}
 
 	void reset_doneboard() {
